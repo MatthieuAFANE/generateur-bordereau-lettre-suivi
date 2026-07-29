@@ -1,0 +1,162 @@
+:root {
+  --bg-color: #000000;
+  --card-bg: #0a0a0a;
+  --border-color: #222222;
+  --text-main: #ffffff;
+  --text-muted: #888888;
+  --accent-color: #3b82f6;
+  --accent-glow: rgba(59, 130, 246, 0.15);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* L'effet de halo lumineux bleu en arrière-plan comme sur votre image */
+  background-image: radial-gradient(circle at 50% 0%, var(--accent-glow) 0%, transparent 50%);
+}
+
+.app-container {
+  width: 100%;
+  max-width: 600px;
+  padding: 40px 20px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  color: var(--text-muted);
+  font-size: 1.1rem;
+}
+
+.card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+  transition: border-color 0.3s ease;
+}
+
+.card-title {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+/* Zone de Drag & Drop */
+.dropzone {
+  border: 2px dashed var(--border-color);
+  border-radius: 8px;
+  padding: 40px 20px;
+  text-align: center;
+  transition: all 0.2s ease;
+  background-color: rgba(255, 255, 255, 0.02);
+  cursor: pointer;
+}
+
+.dropzone.active {
+  border-color: var(--accent-color);
+  background-color: var(--accent-glow);
+}
+
+.dropzone:hover {
+  border-color: #444;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.file-icon {
+  font-size: 32px;
+  margin-bottom: 10px;
+}
+
+.textarea-modern {
+  width: 100%;
+  background-color: #000;
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  padding: 16px;
+  border-radius: 8px;
+  font-size: 1rem;
+  line-height: 1.5;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s ease;
+  font-family: inherit;
+}
+
+.textarea-modern:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 1px var(--accent-color);
+}
+
+/* Bouton principal façon SaaS */
+.btn-primary {
+  width: 100%;
+  padding: 16px;
+  background-color: #ffffff;
+  color: #000000;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.1s ease, opacity 0.2s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+/* Petit bouton secondaire (ex: Coller) */
+.btn-small {
+  background-color: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-small:hover {
+  color: var(--text-main);
+  border-color: var(--text-muted);
+  background-color: rgba(255, 255, 255, 0.05);
+}
