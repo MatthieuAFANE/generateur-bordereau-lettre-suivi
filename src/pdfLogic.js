@@ -1,60 +1,52 @@
 ﻿import { PDFDocument, StandardFonts, degrees } from 'pdf-lib';
 
-export async function genererBordereau(pdfFile, destinataireText) {
-  // 1. On charge le PDF original
-  const originalPdfBytes = await pdfFile.arrayBuffer();
-  const pdfDoc = await PDFDocument.load(originalPdfBytes);
+export const PAGE_WIDTH = 425.20;  // 150 mm en points
+export const PAGE_HEIGHT = 283.46; // 100 mm en points
 
-  // 2. On sélectionne la première page
-  const page = pdfDoc.getPages()[0];
-  const { width: originalWidth, height: originalHeight } = page.getSize();
+// AJOUT: On ajoute expText dans les paramètres
+export async function genererPdfFinal(originalPdfBytes, destText, expText, config) {
+  const srcDoc = await PDFDocument.load(originalPdfBytes);
+  const srcPage = srcDoc.getPages()[0];
+  const { height: originalHeight } = srcPage.getSize();
 
-  // 3. Mesures du rognage (150mm x 100mm)
-  const cropX = 10;       
-  const cropY = 20;       
-  const cropWidth = 425.20;  // 150 mm
-  const cropHeight = 283.46; // 100 mm
-  
-  // En PDF, le point d'origine 0,0 est en bas à gauche.
-  // On calcule donc le bord "bas" de notre zone de découpe.
-  const bottomY = originalHeight - cropY - cropHeight;
+  const bottomY = originalHeight - config.cropY - PAGE_HEIGHT;
+  const cropBox = { 
+    left: config.cropX, 
+    bottom: bottomY, 
+    right: config.cropX + PAGE_WIDTH, 
+    top: bottomY + PAGE_HEIGHT 
+  };
 
-  // 4. On rogne la page aux dimensions 150x100mm
-  page.setCropBox(cropX, bottomY, cropWidth, cropHeight);
-  page.setMediaBox(cropX, bottomY, cropWidth, cropHeight);
+  const pdfDoc = await PDFDocument.create();
+  const page = pdfDoc.addPage([PAGE_WIDTH, PAGE_HEIGHT]);
 
-  // 5. Ajout des polices d'écriture
+  const [embeddedLabel] = await pdfDoc.embedPages([srcPage], [cropBox]);
+  page.drawPage(embeddedLabel, { x: 0, y: 0, xScale: 1, yScale: 1 });
+
   const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-  
-  // 6. Calcul du milieu de la zone découpée
-  const milieuHauteurY = bottomY + (cropHeight / 2);
-  const milieuLargeurX = cropX + (cropWidth / 2);
+  const fontNormal = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
-  // 7. Texte du Destinataire (Moitié gauche, positionné vers le milieu en hauteur)
-  page.drawText(destinataireText, {
-    x: cropX + 15,
-    y: milieuHauteurY - 20,
-    size: 22,
-    font: fontBold,
-    lineHeight: 22,
+  const destPdfY = PAGE_HEIGHT - config.destY - (config.destSize * 0.8);
+  page.drawText(destText, {
+    x: config.destX,
+    y: destPdfY,
+    size: config.destSize,
+    font: config.destBold ? fontBold : fontNormal,
+    lineHeight: config.destSize * 1.2,
   });
 
-  // 8. Texte de l'Expéditeur (Moitié droite, juste à côté)
-  const expediteurText = "Sender:\nMatthieu AFANE\n52 Rue des Vieilles Postes\n51000 Châlons en champagne\nFRANCE";
-  page.drawText(expediteurText, {
-    x: milieuLargeurX + 25,
-    y: milieuHauteurY - 10,
-    size: 10,
-    font: fontBold,
-    lineHeight: 14,
+  // AJOUT: On utilise le texte expText dynamique
+  const expPdfY = PAGE_HEIGHT - config.expY - (config.expSize * 0.8);
+  page.drawText(expText, {
+    x: config.expX,
+    y: expPdfY,
+    size: config.expSize,
+    font: config.expBold ? fontBold : fontNormal,
+    lineHeight: config.expSize * 1.4,
   });
 
-  // 9. Rotation de la page de 90 degrés vers la droite
   page.setRotation(degrees(-90));
 
-  // 10. On génère le document final et on l'ouvre
-  const pdfBytes = await pdfDoc.save();
-  const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-  const url = URL.createObjectURL(blob);
-  window.open(url, '_blank');
+  const finalBytes = await pdfDoc.save();
+  return new Blob([finalBytes], { type: 'application/pdf' });
 }
